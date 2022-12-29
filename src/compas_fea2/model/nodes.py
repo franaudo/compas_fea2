@@ -11,6 +11,7 @@ import compas_fea2
 
 from compas_fea2.units._utils import convert_to_magnitude
 from compas_fea2.units._utils import assign_default_units
+from compas_fea2.units._utils import to_default_units
 
 class Node(FEAData):
     """Initialises base Node object.
@@ -107,9 +108,9 @@ xyz         : {:P~}, {:P~}, {:P~}
 """.format(self.__class__.__name__,
            len(self.__class__.__name__) * '-',
            self.name,
-           self.x.to_base_units(),
-           self.y.to_base_units(),
-           self.z.to_base_units()
+           to_default_units(self.x, 'length'),
+           to_default_units(self.y, 'length'),
+           to_default_units(self.z, 'length')
            )
 
 

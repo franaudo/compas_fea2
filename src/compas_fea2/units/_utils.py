@@ -4,8 +4,7 @@ from typing import Iterable
 
 def convert_to_magnitude(value):
     from compas_fea2 import UNITS
-    from compas_fea2 import DEFAULT_UNITS
-    if isinstance(value, Iterable):
+    if isinstance(value, (list, tuple, set)):
         converted_value=[]
         for v in value:
             if not isinstance(v, Quantity):
@@ -41,7 +40,7 @@ def assign_default_units(value, unit_type):
     """
     from compas_fea2 import UNITS
     from compas_fea2 import DEFAULT_UNITS
-    if isinstance(value, Iterable):
+    if isinstance(value, (list, tuple, set)):
         converted_value=[]
         for v in value:
             if not isinstance(v, Quantity):

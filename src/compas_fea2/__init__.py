@@ -115,6 +115,8 @@ def change_units(system):
     if system not in ['SI', 'SI_mm', 'imperial', 'US']:
         raise ValueError('The units system must be one of the following [SI, SI_mm, imperial, US]')
     UNITS.default_system = system
+    global DEFAULT_UNITS
+    DEFAULT_UNITS = DEFAULT_UNITS_DICT[system]
     return UNITS
 
 def set_precision(precision):

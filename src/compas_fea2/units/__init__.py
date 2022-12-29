@@ -34,6 +34,7 @@ DEFAULT_UNITS_DICT = {
         'mass': 'slug',
         'temperature': 'K',
         'time': 's',
+        'density': 'slug/foot**3',
         'force': 'kip',
         'pressure': 'ksi',
         'stress': 'ksi',
