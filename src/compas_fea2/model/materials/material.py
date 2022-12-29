@@ -3,7 +3,9 @@ from __future__ import division
 from __future__ import print_function
 
 from compas_fea2.base import FEAData
-
+from compas_fea2.units._utils import convert_to_magnitude
+from compas_fea2.units._utils import assign_default_units
+from compas_fea2.units._utils import to_default_units
 
 class _Material(FEAData):
     """
@@ -46,9 +48,9 @@ class _Material(FEAData):
 
     def __init__(self, *, density, expansion=None, name=None, **kwargs):
         super(_Material, self).__init__(name=name, **kwargs)
-        self.density = density
-        self.expansion = expansion
         self._key = None
+        self.density = assign_default_units(density, 'density')
+        self.expansion = assign_default_units(expansion, 'expansion')
 
     @property
     def key(self):
@@ -65,7 +67,12 @@ class _Material(FEAData):
 name        : {}
 density     : {}
 expansion   : {}
-""".format(self.__class__.__name__, len(self.__class__.__name__) * '-', self.name, self.density, self.expansion)
+""".format(self.__class__.__name__,
+           len(self.__class__.__name__) * '-',
+           self.name,
+           to_default_units(self.density, 'density'),
+           to_default_units(self.expansion, 'expansion')
+           )
 
     def __html__(self):
         return """<html>
@@ -128,15 +135,15 @@ class ElasticOrthotropic(_Material):
 
     def __init__(self, *, Ex, Ey, Ez, vxy, vyz, vzx, Gxy, Gyz, Gzx, density, expansion=None, name=None, **kwargs):
         super(ElasticOrthotropic, self).__init__(density=density, expansion=expansion, name=name, **kwargs)
-        self.Ex = Ex
-        self.Ey = Ey
-        self.Ez = Ez
+        self.Ex = assign_default_units(Ex, 'stress')
+        self.Ey = assign_default_units(Ey, 'stress')
+        self.Ez = assign_default_units(Ez, 'stress')
         self.vxy = vxy
         self.vyz = vyz
         self.vzx = vzx
-        self.Gxy = Gxy
-        self.Gyz = Gyz
-        self.Gzx = Gzx
+        self.Gxy = assign_default_units(Gxy, 'stress')
+        self.Gyz = assign_default_units(Gyz, 'stress')
+        self.Gzx = assign_default_units(Gzx, 'stress')
 
     def __str__(self):
         return """
@@ -156,8 +163,19 @@ Gxy : {}
 Gyz : {}
 Gzx : {}
 """.format(self.__class__.__name__, len(self.__class__.__name__) * '-',
-           self.name, self.density, self.expansion,
-           self.Ex, self.Ey, self.Ez, self.vxy, self.vyz, self.vzx, self.Gxy, self.Gyz, self.Gzx)
+           self.name,
+           to_default_units(self.density, 'density'),
+           to_default_units(self.expansion, 'expansion'),
+           to_default_units(self.Ex, 'stress'),
+           to_default_units(self.Ey, 'stress'),
+           to_default_units(self.Ez, 'stress'),
+           self.vxy,
+           self.vyz,
+           self.vzx,
+           to_default_units(self.Gxy, 'stress'),
+           to_default_units(self.Gyz, 'stress'),
+           to_default_units(self.Gzx, 'stress')
+           )
 
 
 class ElasticIsotropic(_Material):
@@ -184,7 +202,7 @@ class ElasticIsotropic(_Material):
 
     def __init__(self, *, E, v, density, expansion=None, name=None, **kwargs):
         super(ElasticIsotropic, self).__init__(density=density, expansion=expansion, name=name, **kwargs)
-        self.E = E
+        self.E = assign_default_units(E, 'stress')
         self.v = v
 
     def __str__(self):
@@ -198,7 +216,13 @@ expansion   : {}
 E : {}
 v : {}
 G : {}
-""".format(self.name, self.density, self.expansion, self.E, self.v, self.G)
+""".format(self._name,
+           to_default_units(self.density, 'density'),
+           to_default_units(self.expansion, 'expansion'),
+           to_default_units(self.E, 'stress'),
+           self.v,
+           to_default_units(self.G, 'stress')
+)
 
     @property
     def G(self):
@@ -259,7 +283,13 @@ v  : {}
 G  : {}
 
 strain_stress : {}
-""".format(self.name, self.density, self.expansion, self.E, self.v, self.G, self.strain_stress)
+""".format(self.name,
+           to_default_units(self.density, 'density'),
+           to_default_units(self.expansion, 'expansion'),
+           to_default_units(self.E, 'stress'),
+           self.v,
+           to_default_units(self.G, 'stress'),
+           self.strain_stress)
 
 
 # ==============================================================================

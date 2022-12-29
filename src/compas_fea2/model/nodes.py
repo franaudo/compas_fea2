@@ -9,6 +9,9 @@ from compas_fea2.base import FEAData
 from .bcs import _BoundaryCondition
 import compas_fea2
 
+from compas_fea2.units._utils import convert_to_magnitude
+from compas_fea2.units._utils import assign_default_units
+
 class Node(FEAData):
     """Initialises base Node object.
 
@@ -74,21 +77,19 @@ class Node(FEAData):
     >>> node = Node(xyz=(1.0, 2.0, 3.0))
 
     """
-
     def __init__(self, xyz, mass=None, temperature=None, name=None, **kwargs):
         super(Node, self).__init__(name=name, **kwargs)
         self._key = None
-
+        self._x = None
+        self._y = None
+        self._z = None
         self.xyz = xyz
-        self._x = xyz[0]
-        self._y = xyz[1]
-        self._z = xyz[2]
 
         self._bc = None
         self._dof = {'x': True, 'y': True, 'z': True, 'xx': True, 'yy': True, 'zz': True}
-
-        self._mass = mass if isinstance(mass, tuple) else tuple([mass]*3)
-        self._temperature = temperature
+        mass = mass if isinstance(mass, tuple) else tuple([mass]*3)
+        self._mass = assign_default_units(mass, 'mass') if all(mass) else mass
+        self._temperature = assign_default_units(temperature, 'temperature') if temperature else temperature
 
         self._on_boundary = None
         self._is_reference = False
@@ -96,6 +97,21 @@ class Node(FEAData):
         self._loads = {}
         self._displacements = {}
         self._results = {}
+
+    def __str__(self):
+        return """
+{}
+{}
+name        : {}
+xyz         : {:P~}, {:P~}, {:P~}
+""".format(self.__class__.__name__,
+           len(self.__class__.__name__) * '-',
+           self.name,
+           self.x.to_base_units(),
+           self.y.to_base_units(),
+           self.z.to_base_units()
+           )
+
 
     @property
     def part(self):
@@ -117,9 +133,7 @@ class Node(FEAData):
     def xyz(self, value):
         if len(value)!=3:
             raise ValueError('Provide a 3 element touple or list')
-        self._x = value[0]
-        self._y = value[1]
-        self._z = value[2]
+        self._x, self._y, self._z = assign_default_units(value, 'length')
 
     @property
     def x(self):
@@ -127,7 +141,7 @@ class Node(FEAData):
 
     @x.setter
     def x(self, value):
-        self._x = float(value)
+        self._x = assign_default_units(float(value), 'length')
 
     @property
     def y(self):
@@ -135,7 +149,7 @@ class Node(FEAData):
 
     @y.setter
     def y(self, value):
-        self._y = float(value)
+        self._y = assign_default_units(float(value), 'length')
 
     @property
     def z(self):
@@ -143,7 +157,7 @@ class Node(FEAData):
 
     @z.setter
     def z(self, value):
-        self._z = float(value)
+        self._z = assign_default_units(float(value), 'length')
 
     @property
     def mass(self):
@@ -151,7 +165,8 @@ class Node(FEAData):
 
     @mass.setter
     def mass(self, value):
-        self._mass = value if isinstance(value, tuple) else tuple([value]*3)
+        mass = value if isinstance(value, tuple) else tuple([value]*3)
+        self._mass = assign_default_units(mass, 'mass')
 
     @property
     def temperature(self):
@@ -159,7 +174,7 @@ class Node(FEAData):
 
     @temperature.setter
     def temperature(self, value):
-        self._temperature = value
+        self._temperature = assign_default_units(value, 'temperature')
 
     @property
     def gkey(self):
@@ -198,4 +213,4 @@ class Node(FEAData):
 
     @property
     def point(self):
-        return Point(*self.xyz)
+        return Point(*convert_to_magnitude(self.xyz))

@@ -5,7 +5,7 @@ from __future__ import print_function
 from abc import abstractmethod
 from math import pi
 
-from compas_fea2 import units
+from compas_fea2 import get_registry
 from compas_fea2.base import FEAData
 from .materials import _Material
 
@@ -264,12 +264,12 @@ gw  : {}
            len(self.__class__.__name__) * '-',
            self.name,
            self.material,
-           (self.A * units['m**2']),
-           (self.Ixx * units['m**4']),
-           (self.Iyy * units['m**4']),
-           (self.Ixy * units['m**4']),
-           (self.Avx * units['m**2']),
-           (self.Avy * units['m**2']),
+           (self.A * get_registry['m**2']),
+           (self.Ixx * get_registry['m**4']),
+           (self.Iyy * get_registry['m**4']),
+           (self.Ixy * get_registry['m**4']),
+           (self.Avx * get_registry['m**2']),
+           (self.Avy * get_registry['m**2']),
            self.J,
            self.g0,
            self.gw)

@@ -45,6 +45,13 @@ class FEAData(Data):
         self._name = name or ''.join([c for c in type(self).__name__ if c.isupper()])+"_"+str(id(self))
         self._registration = None
 
+    @property
+    def name(self):
+        return self._name
+    @name.setter
+    def name(self, value):
+        self._name = value
+
     def __new__(cls, *args, **kwargs):
         """Try to get the backend plug-in implementation, otherwise use the base
         one.

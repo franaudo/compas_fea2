@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from compas_fea2 import units
+import compas_fea2
 from .material import _Material, ElasticIsotropic
 
 
@@ -94,12 +94,25 @@ ep : {:.2f}
 
     #TODO check values and make unit independent
     @classmethod
-    def S355(cls):
+    def S355(cls, units=None):
         """Steel S355.
+
+        Parameters
+        ----------
+        units : :class:`pint.UinitRegistry, optional
+            The units of the Model. If not provided, the units are set to 'SI-mm' by
+            default.
 
         Returns
         -------
         :class:`compas_fea2.model.material.Steel`
             The precompiled steel material.
         """
-        return cls(fy=355, fu=None, eu=20, E=210, v=0.3, density=7850, name=None)
+        units = units or compas_fea2.get_registry(system='SI_mm')
+        return cls(fy=(355*units['MPa']).to_base_units(),
+                   fu=None,
+                   eu=20,
+                   E=(210*units['GPa']).to_base_units(),
+                   v=0.3,
+                   density=(7850*units['kg/m**2']).to_base_units(),
+                   name=None)

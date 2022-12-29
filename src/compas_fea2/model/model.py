@@ -25,8 +25,6 @@ from compas_fea2.model.ics import _InitialCondition, InitialStressField
 from compas_fea2.model.groups import _Group, NodesGroup, PartsGroup, ElementsGroup, FacesGroup
 from compas_fea2.model.constraints import _Constraint, TieMPC, BeamMPC
 
-from compas_fea2.units import units
-
 class Model(FEAData):
     """Class representing an FEA model.
 
