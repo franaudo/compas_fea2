@@ -9,9 +9,11 @@ from compas_fea2.base import FEAData
 from .bcs import _BoundaryCondition
 import compas_fea2
 
+from compas_fea2 import UNITS
 from compas_fea2.units._utils import convert_to_magnitude
 from compas_fea2.units._utils import assign_default_units
 from compas_fea2.units._utils import to_default_units
+from compas_fea2.units._utils import to_base_units
 
 class Node(FEAData):
     """Initialises base Node object.
@@ -89,8 +91,8 @@ class Node(FEAData):
         self._bc = None
         self._dof = {'x': True, 'y': True, 'z': True, 'xx': True, 'yy': True, 'zz': True}
         mass = mass if isinstance(mass, tuple) else tuple([mass]*3)
-        self._mass = assign_default_units(mass, 'mass') if all(mass) else mass
-        self._temperature = assign_default_units(temperature, 'temperature') if temperature else temperature
+        self._mass = assign_default_units(mass, 'kg') if all(mass) else mass
+        self._temperature = assign_default_units(temperature, 'K') if temperature else temperature
 
         self._on_boundary = None
         self._is_reference = False
@@ -104,13 +106,13 @@ class Node(FEAData):
 {}
 {}
 name        : {}
-xyz         : {:P~}, {:P~}, {:P~}
+xyz         : {}, {}, {}
 """.format(self.__class__.__name__,
            len(self.__class__.__name__) * '-',
            self.name,
-           to_default_units(self.x, 'length'),
-           to_default_units(self.y, 'length'),
-           to_default_units(self.z, 'length')
+           to_base_units(self.x),
+           to_base_units(self.y),
+           to_base_units(self.z)
            )
 
 
@@ -134,7 +136,7 @@ xyz         : {:P~}, {:P~}, {:P~}
     def xyz(self, value):
         if len(value)!=3:
             raise ValueError('Provide a 3 element touple or list')
-        self._x, self._y, self._z = assign_default_units(value, 'length')
+        self._x, self._y, self._z = assign_default_units(value, 'mm')
 
     @property
     def x(self):
@@ -142,7 +144,7 @@ xyz         : {:P~}, {:P~}, {:P~}
 
     @x.setter
     def x(self, value):
-        self._x = assign_default_units(float(value), 'length')
+        self._x = assign_default_units(float(value), 'mm')
 
     @property
     def y(self):
@@ -150,7 +152,7 @@ xyz         : {:P~}, {:P~}, {:P~}
 
     @y.setter
     def y(self, value):
-        self._y = assign_default_units(float(value), 'length')
+        self._y = assign_default_units(float(value), 'mm')
 
     @property
     def z(self):
@@ -158,7 +160,7 @@ xyz         : {:P~}, {:P~}, {:P~}
 
     @z.setter
     def z(self, value):
-        self._z = assign_default_units(float(value), 'length')
+        self._z = assign_default_units(float(value), 'mm')
 
     @property
     def mass(self):
@@ -167,7 +169,7 @@ xyz         : {:P~}, {:P~}, {:P~}
     @mass.setter
     def mass(self, value):
         mass = value if isinstance(value, tuple) else tuple([value]*3)
-        self._mass = assign_default_units(mass, 'mass')
+        self._mass = assign_default_units(mass, 'kg')
 
     @property
     def temperature(self):
@@ -175,7 +177,7 @@ xyz         : {:P~}, {:P~}, {:P~}
 
     @temperature.setter
     def temperature(self, value):
-        self._temperature = assign_default_units(value, 'temperature')
+        self._temperature = assign_default_units(value, 'K')
 
     @property
     def gkey(self):

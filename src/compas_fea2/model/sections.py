@@ -5,9 +5,13 @@ from __future__ import print_function
 from abc import abstractmethod
 from math import pi
 
-from compas_fea2 import get_registry
 from compas_fea2.base import FEAData
 from .materials import _Material
+
+from compas_fea2 import UNITS
+from compas_fea2.units._utils import convert_to_magnitude
+from compas_fea2.units._utils import assign_default_units
+from compas_fea2.units._utils import to_default_units
 
 
 class _Section(FEAData):
@@ -100,8 +104,8 @@ class MassSection(FEAData):
 
     def __init__(self, mass, name=None, **kwargs):
         super(MassSection, self).__init__(name=name, **kwargs)
-        self.mass = mass
         self._key = None
+        self.mass = assign_default_units(mass, 'kg')
 
     @property
     def key(self):
@@ -113,7 +117,9 @@ Mass Section  {}
 --------{}
 model    : {!r}
 mass     : {}
-""".format(self.name, '-'*len(self.name), self.model, self.mass)
+""".format(self.name, '-'*len(self.name),
+           self.model,
+           to_default_units(self.mass, 'mass'))
 
 
 class SpringSection(FEAData):
@@ -219,7 +225,7 @@ class BeamSection(_Section):
     Avy : float
         Shear area along y
     J : float
-        Torsion modulus.
+        Torsion constant.
     g0 : float
         ???
     gw : float
@@ -234,13 +240,13 @@ class BeamSection(_Section):
 
     def __init__(self, *, A, Ixx, Iyy, Ixy, Avx, Avy, J, g0, gw, material, name=None, **kwargs):
         super(BeamSection, self).__init__(material=material, name=name, **kwargs)
-        self.A = A
-        self.Ixx = Ixx
-        self.Iyy = Iyy
-        self.Ixy = Ixy
-        self.Avx = Avx
-        self.Avy = Avy
-        self.J = J
+        self.A = assign_default_units(A, 'mm**2')
+        self.Ixx =  assign_default_units(Ixx, 'mm**4')
+        self.Iyy = assign_default_units(Iyy, 'mm**4')
+        self.Ixy = assign_default_units(Ixy, 'mm**4')
+        self.Avx = assign_default_units(Avx, 'mm**2')
+        self.Avy = assign_default_units(Avy, 'mm**2')
+        self.J = assign_default_units(J, 'mm**4')
         self.g0 = g0
         self.gw = gw
 
@@ -264,12 +270,12 @@ gw  : {}
            len(self.__class__.__name__) * '-',
            self.name,
            self.material,
-           (self.A * get_registry['m**2']),
-           (self.Ixx * get_registry['m**4']),
-           (self.Iyy * get_registry['m**4']),
-           (self.Ixy * get_registry['m**4']),
-           (self.Avx * get_registry['m**2']),
-           (self.Avy * get_registry['m**2']),
+           self.A,
+           self.Ixx,
+           self.Iyy,
+           self.Ixy,
+           self.Avx,
+           self.Avy,
            self.J,
            self.g0,
            self.gw)
@@ -331,9 +337,9 @@ class AngleSection(BeamSection):
     """
 
     def __init__(self, w, h, t, material, name=None, **kwargs):
-        self.w = w
-        self.h = h
-        self.t = t
+        self.w = assign_default_units(w, 'mm')
+        self.h = assign_default_units(h, 'mm')
+        self.t = assign_default_units(t, 'mm')
 
         p = 2. * (w + h - t)
         xc = (w**2 + h * t - t**2) / p
@@ -418,10 +424,10 @@ class BoxSection(BeamSection):
     """
 
     def __init__(self, w, h, tw, tf, material, name=None, **kwargs):
-        self.w = w
-        self.h = h
-        self.tw = tw
-        self.tf = tf
+        self.w = assign_default_units(w, 'mm')
+        self.h = assign_default_units(h, 'mm')
+        self.tw = assign_default_units(tw, 'mm')
+        self.tf = assign_default_units(tf, 'mm')
 
         Ap = (h - tf) * (w - tw)
         p = 2 * ((h - tf) / tw + (w - tw) / tf)
@@ -483,7 +489,7 @@ class CircularSection(BeamSection):
     """
 
     def __init__(self, r, material, name=None, **kwargs):
-        self.r = r
+        self.r = assign_default_units(r, 'mm')
 
         D = 2 * r
         A = 0.25 * pi * D**2
@@ -605,10 +611,10 @@ class ISection(BeamSection):
     """
 
     def __init__(self, w, h, tw, tf, material, name=None, **kwargs):
-        self.w = w
-        self.h = h
-        self.tw = tw
-        self.tf = tf
+        self.w = assign_default_units(w, 'mm')
+        self.h = assign_default_units(h, 'mm')
+        self.tw = assign_default_units(tw, 'mm')
+        self.tf = assign_default_units(tf, 'mm')
 
         A = 2 * w * tf + (h - 2 * tf) * tw
         Ixx = (tw * (h - 2 * tf)**3) / 12. + 2 * ((tf**3) * w / 12. + w * tf * (h / 2. - tf / 2.)**2)
@@ -671,8 +677,8 @@ class PipeSection(BeamSection):
     """
 
     def __init__(self, r, t, material, name=None, **kwargs):
-        self.r = r
-        self.t = t
+        self.r = assign_default_units(r, 'mm')
+        self.t = assign_default_units(t, 'mm')
 
         D = 2 * r
 
@@ -737,8 +743,8 @@ class RectangularSection(BeamSection):
     """
 
     def __init__(self, w, h, material, name=None, **kwargs):
-        self.w = w
-        self.h = h
+        self.w = assign_default_units(w, 'mm')
+        self.h = assign_default_units(h, 'mm')
 
         l1 = max([w, h])
         l2 = min([w, h])
@@ -813,9 +819,9 @@ class TrapezoidalSection(BeamSection):
     """
 
     def __init__(self, w1, w2, h, material, name=None, **kwargs):
-        self.w1 = w1
-        self.w2 = w2
-        self.h = h
+        self.w1 = assign_default_units(w1, 'mm')
+        self.w2 = assign_default_units(w2, 'mm')
+        self.h = assign_default_units(h, 'mm')
 
         # c = (h * (2 * w2 + w1)) / (3. * (w1 + w2))  # NOTE: not used
 
@@ -875,14 +881,14 @@ class TrussSection(BeamSection):
     """
 
     def __init__(self, A, material, name=None, **kwargs):
-        Ixx = 0
-        Iyy = 0
-        Ixy = 0
-        Avx = 0
-        Avy = 0
-        J = 0
-        g0 = 0
-        gw = 0
+        Ixx = assign_default_units(0, 'mm')
+        Iyy = assign_default_units(0, 'mm')
+        Ixy = assign_default_units(0, 'mm')
+        Avx = assign_default_units(0, 'mm')
+        Avy = assign_default_units(0, 'mm')
+        J = assign_default_units(0, 'mm')
+        g0 = assign_default_units(0, 'mm')
+        gw = assign_default_units(0, 'mm')
         super(TrussSection, self).__init__(A=A, Ixx=Ixx, Iyy=Iyy, Ixy=Ixy,
                                            Avx=Avx, Avy=Avy, J=J, g0=g0, gw=gw, material=material, name=name, **kwargs)
 
@@ -1007,7 +1013,7 @@ class ShellSection(_Section):
 
     def __init__(self, t, material, name=None, **kwargs):
         super(ShellSection, self).__init__(material=material, name=name, **kwargs)
-        self.t = t
+        self.t = assign_default_units(t, 'mm')
 
 
 class MembraneSection(_Section):
@@ -1015,7 +1021,7 @@ class MembraneSection(_Section):
 
     Parameters
     ----------
-    t : float
+    thickness : float
         Thickness.
     material : :class:`compas_fea2.model._Material`
         The section material.
@@ -1037,7 +1043,7 @@ class MembraneSection(_Section):
 
     def __init__(self, t, material, name=None, **kwargs):
         super(MembraneSection, self).__init__(material=material, name=name, **kwargs)
-        self.t = t
+        self.t = assign_default_units(t, 'mm')
 
 
 # ==============================================================================

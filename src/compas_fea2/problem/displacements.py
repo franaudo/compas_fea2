@@ -4,6 +4,10 @@ from __future__ import print_function
 
 from compas_fea2.base import FEAData
 
+from compas_fea2 import UNITS
+from compas_fea2.units._utils import convert_to_magnitude
+from compas_fea2.units._utils import assign_default_units
+from compas_fea2.units._utils import to_default_units
 
 class GeneralDisplacement(FEAData):
     """GeneralDisplacement object.
@@ -55,12 +59,12 @@ class GeneralDisplacement(FEAData):
 
     def __init__(self, x=0, y=0, z=0, xx=0, yy=0, zz=0, axes='global', name=None, **kwargs):
         super(GeneralDisplacement, self).__init__(name=name, **kwargs)
-        self.x = x
-        self.y = y
-        self.z = z
-        self.xx = xx
-        self.yy = yy
-        self.zz = zz
+        self.x = assign_default_units(x, 'mm')
+        self.y = assign_default_units(y, 'mm')
+        self.z = assign_default_units(z, 'mm')
+        self.xx = assign_default_units(xx, 'rad')
+        self.yy = assign_default_units(yy, 'rad')
+        self.zz = assign_default_units(zz, 'rad')
         self._axes = axes
 
     @property

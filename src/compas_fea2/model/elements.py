@@ -325,7 +325,7 @@ class Face(FEAData):
         super(Face, self).__init__(name)
         self._nodes = nodes
         self._tag = tag
-        self._plane = Plane.from_three_points(*[node.xyz for node in nodes])  # TODO check when more than 3 nodes
+        self._plane = Plane.from_three_points(*[[c.to_base_units().magnitude for c in node.xyz] for node in nodes])  # TODO check when more than 3 nodes
         self._registration = element
         self._results = {}
 

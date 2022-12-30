@@ -19,7 +19,7 @@ def convert_to_magnitude(value):
             return value.to_base_units().magnitude
 
 
-def assign_default_units(value, unit_type):
+def assign_default_units(value, units):
     """Convert a value of a give dimensionality to the default units. You can see
     the list of default units for the chosen system of units by running:
 
@@ -39,13 +39,13 @@ def assign_default_units(value, unit_type):
         The value in the default units for the units system.
     """
     from compas_fea2 import UNITS
-    from compas_fea2 import DEFAULT_UNITS
+    # from compas_fea2 import DEFAULT_UNITS
     if isinstance(value, (list, tuple, set)):
         converted_value=[]
         for v in value:
             if not isinstance(v, Quantity):
                 if v:
-                    converted_value.append(v*UNITS[DEFAULT_UNITS[unit_type.lower()]])
+                    converted_value.append(v*UNITS[units])
                 else:
                     converted_value.append(v)
             else:
@@ -54,7 +54,7 @@ def assign_default_units(value, unit_type):
     else:
         if not isinstance(value, Quantity):
             if value:
-                return value*UNITS[DEFAULT_UNITS[unit_type.lower()]]
+                return value*UNITS[units]
             else:
                 return value
         else:
@@ -64,5 +64,11 @@ def to_default_units(value, units_type):
     from compas_fea2 import DEFAULT_UNITS
     if isinstance(value, Quantity):
         return value.to(DEFAULT_UNITS[units_type])
+    else:
+        return value
+
+def to_base_units(value):
+    if isinstance(value, Quantity):
+        return value.to_base_units()
     else:
         return value

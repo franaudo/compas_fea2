@@ -4,8 +4,10 @@ from __future__ import print_function
 
 from compas_fea2.base import FEAData
 
-# TODO: make units independent using the utilities function
-
+from compas_fea2 import UNITS
+from compas_fea2.units._utils import convert_to_magnitude
+from compas_fea2.units._utils import assign_default_units
+from compas_fea2.units._utils import to_default_units
 
 class _Load(FEAData):
     """Initialises base Load object.
@@ -38,12 +40,12 @@ class _Load(FEAData):
     def __init__(self, x=None, y=None, z=None, xx=None, yy=None, zz=None, axes='global', name=None, **kwargs):
         super(_Load, self).__init__(name=name, **kwargs)
         self._axes = axes
-        self.x = x
-        self.y = y
-        self.z = z
-        self.xx = xx
-        self.yy = yy
-        self.zz = zz
+        self.x = assign_default_units(x, 'N')
+        self.y = assign_default_units(y, 'N')
+        self.z = assign_default_units(z, 'N')
+        self.xx = assign_default_units(xx, 'N*mm')
+        self.yy = assign_default_units(yy, 'N*mm')
+        self.zz = assign_default_units(zz, 'N*mm')
 
     def __rmul__(self, other):
         if isinstance(other, (float, int)):
@@ -239,7 +241,7 @@ class GravityLoad(_Load):
 
     def __init__(self, g, x=0, y=0, z=-1, name=None, **kwargs):
         super(GravityLoad, self).__init__(x=x, y=y, z=z, axes='global', name=name, **kwargs)
-        self._g = g
+        self._g = assign_default_units(g, 'kg*mm/s**2')
 
     @property
     def g(self):

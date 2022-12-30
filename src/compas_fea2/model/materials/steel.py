@@ -4,7 +4,9 @@ from __future__ import print_function
 
 import compas_fea2
 from .material import _Material, ElasticIsotropic
-
+from compas_fea2.units._utils import convert_to_magnitude
+from compas_fea2.units._utils import assign_default_units
+from compas_fea2.units._utils import to_default_units
 
 class Steel(ElasticIsotropic):
     """Bi-linear steel with given yield stress.
@@ -43,15 +45,10 @@ class Steel(ElasticIsotropic):
 
     """
 
-    def __init__(self, *, fy, fu, eu, E, v, density, name=None, **kwargs):
+    def __init__(self, *, E, v, density, fy, fu=None, eu=None, name=None, **kwargs):
         super(Steel, self).__init__(E=E, v=v, density=density, name=name, **kwargs)
 
         fu = fu or fy
-
-        E *= 10**9
-        fu *= 10**6
-        fy *= 10**6
-        eu *= 0.01
 
         ep = eu - fy / E
         f = [fy, fu]
@@ -91,6 +88,7 @@ ep : {:.2f}
            (self.v * units.dimensionless),
            (self.eu * units.dimensionless),
            (self.ep * units.dimensionless))
+
 
     #TODO check values and make unit independent
     @classmethod
